@@ -154,6 +154,52 @@ def format_nutrition_output(raw_text: str):
     return build_markdown(data), json.dumps(data, indent=2)
 ```
 
+## 🔍 Detailed Script Analysis
+
+### 1. `dataset_builder.py` — The Multimodal Engine
+This script generates the `train.jsonl` and `eval.jsonl` files required by the trainer. It doesn't just store text; it orchestrates the creation of a heterogeneous media library.
+
+- **Audio Synthesis**: Uses `gTTS` (Google Text-to-Speech) to transform static text into 16kHz WAV files. The `VOICE_LOG_TEMPLATES` provide natural linguistic variety to ensure the model learns to extract food items from conversational speech.
+- **Video Simulation**: Since Gemma 4 processes video as a sequence of frames, this script simulates a "walkthrough" by taking an image and generating a series of overlapping crops. This teaches the model temporal consistency—recognizing the same food item across multiple frames.
+
+### 2. `train_nutrivision.py` — The Optimization Core
+This script uses **Unsloth** to perform memory-efficient fine-tuning.
+
+- **`resolve_content()`**: A critical utility that converts the string paths in your JSONL into in-memory `PIL.Image` objects and `numpy` arrays. It automatically resamples all audio to **16kHz mono**, as required by the Gemma 4 audio encoder.
+- **`UnslothVisionDataCollator`**: Unlike standard text collators, this prepares the multimodal tensors. It handles the simultaneous padding of images, audio waveforms, and text tokens into a single batch.
+- **`LossLogger` Callback**: Monitors training health. Note that Gemma 4 multimodal training typically starts with a **Loss of 13.0 - 15.0**. This is normal behavior due to the high entropy of initialized vision-language projectors.
+
+### 3. `gradio_app.py` — The Production Interface
+The app is designed for "cold-start" efficiency and robust multimodal handling.
+
+- **`FastVisionModel.for_inference()`**: This Unsloth-exclusive method optimizes the KV-cache and weights for 2x faster generation compared to standard HF inference.
+- **Interleaved Prompting**: The app strictly follows the Gemma 4 requirement that **media tokens must appear before text tokens** in the input sequence. If you send text before an image, the model's spatial attention may fail.
+
+---
+
+## 📈 Interaction Flowchart
+
+```mermaid
+graph LR
+    subgraph Data_Prep [Data Generation]
+        DB[dataset_builder.py] --> J[train.jsonl]
+        DB --> M[Media Folders]
+    end
+
+    subgraph Training [LoRA Fine-tuning]
+        J --> TN[train_nutrivision.py]
+        M --> TN
+        TN --> A[nutrivision_adapter/]
+    end
+
+    subgraph Serving [Interactive Demo]
+        A --> G[gradio_app.py]
+        U[User Upload] --> G
+        G --> R[Nutrition JSON]
+    end
+```
+
+## ✨ Key Features
 - 📸 **Visual Analysis**: Identify food items and estimate portions directly from photos.
 - 🎤 **Voice Logging**: Speak naturally (e.g., *"I had two chapatis and dal for lunch"*) and get an automatic log.
 - 🎥 **Video Walkthroughs**: Record your plate for a comprehensive scan of complex meals.
