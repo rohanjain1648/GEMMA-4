@@ -1,0 +1,30 @@
+# NutriVision — Python dependencies
+# Install: pip install -r requirements.txt
+
+# Core ML
+torch>=2.1.0
+transformers>=4.49.0
+trl>=0.15.0
+accelerate>=0.30.0
+peft>=0.9.0
+unsloth[colab-new]
+
+# Data
+datasets>=2.18.0
+huggingface_hub>=0.22.0
+
+# Media processing
+Pillow>=10.0.0
+numpy>=1.24.0
+opencv-python>=4.9.0
+librosa>=0.10.0
+soundfile>=0.12.0
+
+# Audio generation (for synthetic dataset)
+gtts>=2.5.0
+
+# Demo
+gradio>=4.25.0
+
+# Utilities
+tqdm>=4.66.0
