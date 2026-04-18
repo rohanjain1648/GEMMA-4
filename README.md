@@ -14,27 +14,27 @@ NutriVision leverages a unified multimodal architecture where Image, Audio, and 
 ### System Overview
 ```mermaid
 graph TD
-    subgraph Input_Layer [Multimodal Inputs]
-        IMG[📸 Image - JPEG/PNG]
-        AUD[🎤 Audio - WAV/MP3]
-        VID[🎥 Video - MP4/MOV]
+    subgraph Input_Layer ["Multimodal Inputs"]
+        IMG["📸 Image - JPEG/PNG"]
+        AUD["🎤 Audio - WAV/MP3"]
+        VID["🎥 Video - MP4/MOV"]
     end
 
-    subgraph Processing_Layer [Processing & Encoding]
-        PILLOW[Pillow Image Normalization]
-        LIBR[Librosa 16kHz Resampling]
-        CV2[OpenCV Frame Extraction]
+    subgraph Processing_Layer ["Processing & Encoding"]
+        PILLOW["Pillow Image Normalization"]
+        LIBR["Librosa 16kHz Resampling"]
+        CV2["OpenCV Frame Extraction"]
     end
 
-    subgraph Model_Backbone [Gemma 4 Multimodal Backbone]
-        ENC[Multimodal Encoder]
-        LORA[LoRA Adapters - Attention/MLP]
-        GEMMA[Gemma 4 E4B LLM]
+    subgraph Model_Backbone ["Gemma 4 Multimodal Backbone"]
+        ENC["Multimodal Encoder"]
+        LORA["LoRA Adapters - Attention/MLP"]
+        GEMMA["Gemma 4 E4B LLM"]
     end
 
-    subgraph Output_Layer [Structured Output]
-        JSON[Structured JSON Response]
-        GRADIO[Gradio UI Presentation]
+    subgraph Output_Layer ["Structured Output"]
+        JSON["Structured JSON Response"]
+        GRADIO["Gradio UI Presentation"]
     end
 
     IMG --> PILLOW --> ENC
@@ -121,17 +121,17 @@ The Gradio application implements a robust parsing layer to handle the stochasti
 
 ```mermaid
 graph LR
-    U[UI Input] --> P[Prompt Strategy]
-    P --> M[Gemma 4 Inference]
-    M --> R[Raw Response]
-    R --> J[Regex/JSON Parser]
-    J --> D[Markdown Display]
-    J --> S[Stripe/Table View]
+    U["UI Input"] --> P["Prompt Strategy"]
+    P --> M["Gemma 4 Inference"]
+    M --> R["Raw Response"]
+    R --> J["Regex/JSON Parser"]
+    J --> D["Markdown Display"]
+    J --> S["Stripe/Table View"]
 
-    subgraph Parsing_Engine [Robust Extraction]
-        J1[Extract ```json Blocks]
-        J2[Fallback: Regex {..}]
-        J3[Macro Normalization]
+    subgraph Parsing_Engine ["Robust Extraction"]
+        J1["Extract ```json Blocks"]
+        J2["Fallback: Regex {..}"]
+        J3["Macro Normalization"]
     end
 ```
 

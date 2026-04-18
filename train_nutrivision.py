@@ -9,7 +9,7 @@
 #    pip install "unsloth[colab-new]" trl transformers accelerate
 #    pip install datasets pillow
 # ─────────────────────────────────────────────────────────────
-
+import unsloth  # MUST be first — before trl, transformers, peft
 import os
 import json
 import torch
@@ -296,7 +296,6 @@ def main():
         report_to                   = "none",          # set "wandb" if you want W&B logging
         dataset_text_field          = "text",
         dataset_kwargs              = {"skip_prepare_dataset": True},
-        max_seq_length              = CFG.max_seq_length,
         remove_unused_columns       = False,           # REQUIRED for multimodal
     )
 
@@ -309,6 +308,7 @@ def main():
         data_collator  = data_collator,
         formatting_func= make_formatting_func(processor),
         args           = training_args,
+        max_seq_length = CFG.max_seq_length,
         callbacks      = [LossLogger()],
     )
 
