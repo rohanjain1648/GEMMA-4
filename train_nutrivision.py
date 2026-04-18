@@ -265,6 +265,7 @@ def main():
 
     train_dataset = prepare_dataset(CFG.train_jsonl)
     eval_dataset  = prepare_dataset(CFG.eval_jsonl) if Path(CFG.eval_jsonl).exists() else None
+    eval_dataset = None   # disable mid-training eval — mixed modality batching crashes collator
     print(f"  Train: {len(train_dataset)} samples")
     if eval_dataset:
         print(f"  Eval:  {len(eval_dataset)} samples")
@@ -290,8 +291,8 @@ def main():
         bf16                        = use_bf16,
         logging_steps               = CFG.logging_steps,
         save_steps                  = CFG.save_steps,
-        eval_steps                  = CFG.eval_steps if eval_dataset else None,
-        eval_strategy               = "steps" if eval_dataset else "no",
+        eval_steps                  = None,
+        eval_strategy               = "no",
         seed                        = CFG.seed,
         report_to                   = "none",          # set "wandb" if you want W&B logging
         dataset_text_field          = "text",
@@ -320,7 +321,7 @@ def main():
     print(f"  Starting training for {CFG.max_steps} steps...\n")
 
     # ── Train ──────────────────────────────────
-    trainer_stats = trainer.train()
+    trainer_stats = trainer.train(resume_from_checkpoint=True)
 
     # ── Memory summary ─────────────────────────
     used_memory = round(torch.cuda.max_memory_reserved() / 1024 ** 3, 3)
